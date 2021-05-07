@@ -27,6 +27,18 @@ TEST_F(StreamEvaluatorTests, DependencyGetters) {
   EXPECT_NE(test_evaluator_->gold_stream(), nullptr);
 }
 
+TEST_F(StreamEvaluatorTests, BadDependencies) {
+  EXPECT_ANY_THROW({
+                     StreamEvaluator test_evaluator(std::make_unique<StringStream>(), nullptr);
+  });
+  EXPECT_ANY_THROW({
+                     StreamEvaluator test_evaluator(nullptr, std::make_unique<StringStream>());
+                   });
+  EXPECT_ANY_THROW({
+                     StreamEvaluator test_evaluator(nullptr, nullptr);
+                   });
+}
+
 
 TEST_F(StreamEvaluatorTests, BadGoldStream) {
   auto actual_string_stream = std::make_unique<StringStream>();
