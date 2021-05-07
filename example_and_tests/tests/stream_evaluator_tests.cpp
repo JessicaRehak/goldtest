@@ -31,71 +31,56 @@ TEST_F(StreamEvaluatorTests, DependencyGetters) {
 }
 
 TEST_F(StreamEvaluatorTests, BadDependencies) {
-  EXPECT_ANY_THROW({
-                     StreamEvaluator test_evaluator(actual_string_stream_, nullptr);
-  });
-  EXPECT_ANY_THROW({
-                     StreamEvaluator test_evaluator(nullptr, gold_string_stream_);
-                   });
-  EXPECT_ANY_THROW({
-                     StreamEvaluator test_evaluator(nullptr, nullptr);
-                   });
+  EXPECT_THROW(StreamEvaluator(actual_string_stream_, nullptr), std::invalid_argument);
+  EXPECT_THROW(StreamEvaluator(nullptr, gold_string_stream_), std::invalid_argument);
+  EXPECT_THROW(StreamEvaluator(nullptr, nullptr), std::invalid_argument);
 }
 
 TEST_F(StreamEvaluatorTests, SameStream) {
   const std::string input_text{ "1\n2\n3\n4\n5" };
   actual_string_stream_->str(input_text);
   gold_string_stream_->str(input_text);
-  ASSERT_TRUE(test_evaluator_->Compare());
+  EXPECT_TRUE(test_evaluator_->Compare());
 }
 
-//
-//TEST_F(StreamEvaluatorTests, DiffStream) {
-//  std::string gold_text = "1\n2\n3\n4\n5";
-//  std::string actual_text = "1\n2\nX\n4\n5";
-//  gold_iss->str(gold_text);
-//  actual_iss->str(actual_text);
-//  test_helpers::GoldStreamEvaluator test_eval(std::move(gold_iss),
-//                                              std::move(actual_iss));
-//  ASSERT_FALSE(test_eval.Compare());
-//}
-//
-//TEST_F(StreamEvaluatorTests, BadGoldStreamCompare) {
-//  actual_iss->setstate(std::ios_base::goodbit);
-//  gold_iss->setstate(std::ios_base::badbit);
-//  test_helpers::GoldStreamEvaluator test_eval(std::move(gold_iss),
-//                                              std::move(actual_iss));
-//  ASSERT_THROW(test_eval.Compare(), std::runtime_error);
-//}
-//
-//TEST_F(StreamEvaluatorTests, BadActualStreamCompare) {
-//  gold_iss->setstate(std::ios_base::goodbit);
-//  actual_iss->setstate(std::ios_base::badbit);
-//  test_helpers::GoldStreamEvaluator test_eval(std::move(gold_iss),
-//                                              std::move(actual_iss));
-//  ASSERT_THROW(test_eval.Compare(), std::runtime_error);
-//}
-//
-//TEST_F(StreamEvaluatorTests, CompareLongerGold) {
-//  std::string gold_text = "1\n2\n3\n4\n5";
-//  std::string actual_text = "1\n2\n3\n4";
-//  gold_iss->str(gold_text);
-//  actual_iss->str(actual_text);
-//  test_helpers::GoldStreamEvaluator test_eval(std::move(gold_iss),
-//                                              std::move(actual_iss));
-//  ASSERT_FALSE(test_eval.Compare());
-//}
-//
-//TEST_F(StreamEvaluatorTests, CompareLongerActual) {
-//  std::string gold_text = "1\n2\n3\n4";
-//  std::string actual_text = "1\n2\n3\n4\n5";
-//  gold_iss->str(gold_text);
-//  actual_iss->str(actual_text);
-//  test_helpers::GoldStreamEvaluator test_eval(std::move(gold_iss),
-//                                              std::move(actual_iss));
-//  ASSERT_FALSE(test_eval.Compare());
-//}
-//
+
+TEST_F(StreamEvaluatorTests, DiffrentStreams) {
+  const std::string actual_text{ "1\n2\nX\n4\n5" };
+  const std::string gold_text{ "1\n2\n3\n4\n5" };
+  actual_string_stream_->str(actual_text);
+  gold_string_stream_->str(gold_text);
+  EXPECT_FALSE(test_evaluator_->Compare());
+}
+
+TEST_F(StreamEvaluatorTests, CompareBadStreams) {
+  const std::string input_text{ "1\n2\n3\n4\n5" };
+  actual_string_stream_->str(input_text);
+  gold_string_stream_->str(input_text);
+  actual_string_stream_->setstate(std::ios::goodbit);
+  gold_string_stream_->setstate(std::ios::badbit);
+  EXPECT_THROW(test_evaluator_->Compare(), std::runtime_error);
+
+  actual_string_stream_->setstate(std::ios::badbit);
+  gold_string_stream_->setstate(std::ios::goodbit);
+  EXPECT_THROW(test_evaluator_->Compare(), std::runtime_error);
+}
+
+TEST_F(StreamEvaluatorTests, CompareLongerGold) {
+  const std::string actual_text{ "1\n2\n3\n4" };
+  const std::string gold_text{ "1\n2\n3\n4\n5" };
+  actual_string_stream_->str(actual_text);
+  gold_string_stream_->str(gold_text);
+  EXPECT_FALSE(test_evaluator_->Compare());
+}
+
+TEST_F(StreamEvaluatorTests, CompareLongerActual) {
+  const std::string actual_text{ "1\n2\n3\n4\n5" };
+  const std::string gold_text{ "1\n2\n3\n4" };
+  actual_string_stream_->str(actual_text);
+  gold_string_stream_->str(gold_text);
+  EXPECT_FALSE(test_evaluator_->Compare());
+}
+
 //TEST_F(StreamEvaluatorTests, DiffWorks) {
 //  std::string gold_text = "1\n2\nX\n4";
 //  std::string actual_text = "1\n2\n3\n4";
