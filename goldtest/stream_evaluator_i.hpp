@@ -22,16 +22,17 @@ class StreamEvaluatorI {
 
   //! Returns the result of the comparison
   virtual auto StreamsAreTheSame() const -> bool = 0;
+  /*! Returns the result of a "Gold" test, `true` if both streams are good and identical, `false` otherwise.
+   * The main difference is that `StreamsAreTheSame` will throw a runtime error if one or both streams are bad. This
+   * will instead just return false. This is to identify the case where the file to be compared doesn't exist.
+   */
+  virtual auto StreamsAreGoodAndTheSame() const -> bool = 0;
 
   //! Returns the difference between the two streams
   virtual auto GetDiff() const -> std::string = 0;
 
-  //! Returns the result of a "Gold" test, `true` if both streams are good and identical, `false` otherwise
-  virtual auto RunGoldTest() const -> bool = 0;
-
   //! Get the gold input stream
   virtual auto gold_stream() -> InStream* = 0;
-
   //! Get the actual input stream
   virtual auto actual_stream() -> InStream* = 0;
 };
