@@ -21,7 +21,7 @@ class StreamEvaluatorI {
   virtual ~StreamEvaluatorI() = default;
 
   //! Returns the result of the comparison
-  virtual auto Compare() const -> bool = 0;
+  virtual auto StreamsAreTheSame() const -> bool = 0;
 
   //! Returns the difference between the two streams
   virtual auto GetDiff() const -> std::string = 0;

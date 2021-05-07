@@ -28,7 +28,7 @@ class GoldStreamEvaluator : public StreamEvaluatorI {
       throw std::invalid_argument("Pointer to gold stream provided to GoldStreamEvaluator is null");
   };
 
-  bool Compare() const override { return false; };
+  auto StreamsAreTheSame() const -> bool override { return false; }
   std::string GetDiff() const override { return std::string(); };
   bool RunGoldTest() const override { return false; };
 
