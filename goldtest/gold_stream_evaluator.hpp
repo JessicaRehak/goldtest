@@ -38,24 +38,13 @@ class GoldStreamEvaluator : public StreamEvaluatorI {
     ResetStreams();
 
     std::string gold_line{}, actual_line{};
-    unsigned int lines_in_gold_file{ 0 }, lines_in_actual_file{ 0 };
-
-    while(!gold_stream_->eof()) {
-      getline(*gold_stream_, gold_line);
-      ++lines_in_gold_file;
-    }
-    while (!actual_stream_->eof()) {
-      getline(*actual_stream_, actual_line);
-      ++lines_in_actual_file;
-    }
-
-    ResetStreams();
-
+    const auto lines_in_gold_file{ CountLinesAndReset(gold_stream_.get()) };
+    const auto lines_in_actual_file{ CountLinesAndReset(actual_stream_.get()) };
     bool streams_are_the_same{ lines_in_gold_file == lines_in_actual_file };
 
     if (lines_in_gold_file == lines_in_actual_file) {
-      while (getline(*gold_stream_, gold_line)) {
-        getline(*actual_stream_, actual_line);
+      while (std::getline(*gold_stream_, gold_line)) {
+        std::getline(*actual_stream_, actual_line);
         if (gold_line != actual_line) {
           streams_are_the_same = false;
           break;
@@ -82,6 +71,18 @@ class GoldStreamEvaluator : public StreamEvaluatorI {
       stream->seekg(0, std::ios::beg);
     }
   };
+  //! Counts the lines in the provided stream and resets to `bof`
+  auto CountLinesAndReset(InStream* stream) const -> unsigned int {
+    std::string line{};
+    unsigned int lines{ 0 };
+    while(!stream->eof()) {
+      std::getline(*stream, line);
+      ++lines;
+    }
+    stream->clear();
+    stream->seekg(0, std::ios::beg);
+    return lines;
+  }
 
   mutable std::shared_ptr<std::istream> actual_stream_;
   mutable std::shared_ptr<std::istream> gold_stream_;
