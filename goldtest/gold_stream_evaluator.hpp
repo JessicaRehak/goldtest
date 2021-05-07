@@ -20,7 +20,7 @@ namespace goldtest {
 class GoldStreamEvaluator : public StreamEvaluatorI {
  public:
   //! Constructor, takes ownership of two streams for comparison
-  GoldStreamEvaluator(std::unique_ptr<std::istream> actual_stream, std::unique_ptr<std::istream> gold_stream)
+  GoldStreamEvaluator(std::shared_ptr<std::istream> actual_stream, std::shared_ptr<std::istream> gold_stream)
       : actual_stream_(std::move(actual_stream)), gold_stream_(std::move(gold_stream)) {
     if (actual_stream_ == nullptr)
       throw std::invalid_argument("Pointer to actual stream provided to GoldStreamEvaluator is null");
@@ -32,8 +32,6 @@ class GoldStreamEvaluator : public StreamEvaluatorI {
   std::string GetDiff() const override { return std::string(); };
   bool RunGoldTest() const override { return false; };
 
-  bool GoldGood() const override { return gold_stream_->good(); };
-  bool ActualGood() const override { return actual_stream_->good(); };
   auto gold_stream() -> InStream * override { return gold_stream_.get(); }
   auto actual_stream() -> InStream * override { return actual_stream_.get(); }
 
@@ -43,8 +41,8 @@ class GoldStreamEvaluator : public StreamEvaluatorI {
   //! Resets the streams to `bof`
   void ResetStreams() const {};
 
-  mutable std::unique_ptr<std::istream> actual_stream_;
-  mutable std::unique_ptr<std::istream> gold_stream_;
+  mutable std::shared_ptr<std::istream> actual_stream_;
+  mutable std::shared_ptr<std::istream> gold_stream_;
 };
 
 } // namespace goldtest

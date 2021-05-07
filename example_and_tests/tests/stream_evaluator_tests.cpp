@@ -14,12 +14,15 @@ class StreamEvaluatorTests : public ::testing::Test {
 
   std::unique_ptr<StreamEvaluator> test_evaluator_{ nullptr };
 
+  // Dependency pointers
+  std::shared_ptr<StringStream> gold_string_stream_{ std::make_shared<StringStream>() };
+  std::shared_ptr<StringStream> actual_string_stream_{ std::make_shared<StringStream>() };
+
   auto SetUp() -> void override;
 };
 
 auto StreamEvaluatorTests::SetUp() -> void {
-  test_evaluator_ = std::make_unique<StreamEvaluator>(std::make_unique<StringStream>(),
-                                                      std::make_unique<StringStream>());
+  test_evaluator_ = std::make_unique<StreamEvaluator>(actual_string_stream_, gold_string_stream_);
 }
 
 TEST_F(StreamEvaluatorTests, DependencyGetters) {
@@ -29,61 +32,23 @@ TEST_F(StreamEvaluatorTests, DependencyGetters) {
 
 TEST_F(StreamEvaluatorTests, BadDependencies) {
   EXPECT_ANY_THROW({
-                     StreamEvaluator test_evaluator(std::make_unique<StringStream>(), nullptr);
+                     StreamEvaluator test_evaluator(actual_string_stream_, nullptr);
   });
   EXPECT_ANY_THROW({
-                     StreamEvaluator test_evaluator(nullptr, std::make_unique<StringStream>());
+                     StreamEvaluator test_evaluator(nullptr, gold_string_stream_);
                    });
   EXPECT_ANY_THROW({
                      StreamEvaluator test_evaluator(nullptr, nullptr);
                    });
 }
 
-
-TEST_F(StreamEvaluatorTests, BadGoldStream) {
-  auto actual_string_stream = std::make_unique<StringStream>();
-  auto gold_string_stream = std::make_unique<StringStream>();
-  actual_string_stream->setstate(std::ios_base::goodbit);
-  gold_string_stream->setstate(std::ios_base::badbit);
-
-  StreamEvaluator test_evaluator(std::move(actual_string_stream), std::move(gold_string_stream));
-
-  ASSERT_FALSE(test_evaluator.GoldGood());
-  ASSERT_TRUE(test_evaluator.ActualGood());
+TEST_F(StreamEvaluatorTests, SameStream) {
+  const std::string input_text{ "1\n2\n3\n4\n5" };
+  actual_string_stream_->str(input_text);
+  gold_string_stream_->str(input_text);
+  ASSERT_TRUE(test_evaluator_->Compare());
 }
 
-TEST_F(StreamEvaluatorTests, BadActualStream) {
-  auto actual_string_stream = std::make_unique<StringStream>();
-  auto gold_string_stream = std::make_unique<StringStream>();
-  actual_string_stream->setstate(std::ios_base::badbit);
-  gold_string_stream->setstate(std::ios_base::goodbit);
-
-  StreamEvaluator test_evaluator(std::move(actual_string_stream), std::move(gold_string_stream));
-
-  ASSERT_TRUE(test_evaluator.GoldGood());
-  ASSERT_FALSE(test_evaluator.ActualGood());
-}
-
-TEST_F(StreamEvaluatorTests, BadBothStream) {
-  auto actual_string_stream = std::make_unique<StringStream>();
-  auto gold_string_stream = std::make_unique<StringStream>();
-  actual_string_stream->setstate(std::ios_base::badbit);
-  gold_string_stream->setstate(std::ios_base::badbit);
-
-  StreamEvaluator test_evaluator(std::move(actual_string_stream), std::move(gold_string_stream));
-
-  ASSERT_FALSE(test_evaluator.GoldGood());
-  ASSERT_FALSE(test_evaluator.ActualGood());
-}
-
-//TEST_F(StreamEvaluatorTests, SameStream) {
-//  std::string input_text = "1\n2\n3\n4\n5";
-//  gold_iss->str(input_text);
-//  actual_iss->str(input_text);
-//  test_helpers::GoldStreamEvaluator test_eval(std::move(gold_iss),
-//                                              std::move(actual_iss));
-//  ASSERT_TRUE(test_eval.Compare());
-//}
 //
 //TEST_F(StreamEvaluatorTests, DiffStream) {
 //  std::string gold_text = "1\n2\n3\n4\n5";

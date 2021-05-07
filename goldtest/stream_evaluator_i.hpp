@@ -29,12 +29,6 @@ class StreamEvaluatorI {
   //! Returns the result of a "Gold" test, `true` if both streams are good and identical, `false` otherwise
   virtual auto RunGoldTest() const -> bool = 0;
 
-  //! Returns the status of the gold stream
-  virtual auto GoldGood() const -> bool = 0;
-
-  //! Returns the status of the actual stream
-  virtual auto ActualGood() const -> bool = 0;
-
   //! Get the gold input stream
   virtual auto gold_stream() -> InStream* = 0;
 
