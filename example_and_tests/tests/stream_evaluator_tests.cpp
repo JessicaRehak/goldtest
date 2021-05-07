@@ -43,6 +43,14 @@ TEST_F(StreamEvaluatorTests, CompareSameStream) {
   EXPECT_TRUE(test_evaluator_->StreamsAreTheSame());
 }
 
+TEST_F(StreamEvaluatorTests, CompareSameStreamOneAtEOF) {
+  const std::string input_text{ "1\n2\n3\n4\n5" };
+  actual_string_stream_->str(input_text);
+  gold_string_stream_->str(input_text);
+  gold_string_stream_->seekg(0, std::ios::end);
+  EXPECT_TRUE(test_evaluator_->StreamsAreTheSame());
+}
+
 
 TEST_F(StreamEvaluatorTests, CompareDiffrentStreams) {
   const std::string actual_text{ "1\n2\nX\n4\n5" };

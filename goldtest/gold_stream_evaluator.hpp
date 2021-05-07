@@ -28,7 +28,44 @@ class GoldStreamEvaluator : public StreamEvaluatorI {
       throw std::invalid_argument("Pointer to gold stream provided to GoldStreamEvaluator is null");
   };
 
-  auto StreamsAreTheSame() const -> bool override { return false; }
+  auto StreamsAreTheSame() const -> bool override {
+    if (gold_stream_->bad()) {
+      throw std::runtime_error("Error in StreamsAreTheSame: gold stream is bad.");
+    } else if (actual_stream_->bad()) {
+      throw std::runtime_error("Error in StreamsAreTheSame: actual stream is bad.");
+    }
+
+    ResetStreams();
+
+    std::string gold_line{}, actual_line{};
+    unsigned int lines_in_gold_file{ 0 }, lines_in_actual_file{ 0 };
+
+    while(!gold_stream_->eof()) {
+      getline(*gold_stream_, gold_line);
+      ++lines_in_gold_file;
+    }
+    while (!actual_stream_->eof()) {
+      getline(*actual_stream_, actual_line);
+      ++lines_in_actual_file;
+    }
+
+    ResetStreams();
+
+    bool streams_are_the_same{ lines_in_gold_file == lines_in_actual_file };
+
+    if (lines_in_gold_file == lines_in_actual_file) {
+      while (getline(*gold_stream_, gold_line)) {
+        getline(*actual_stream_, actual_line);
+        if (gold_line != actual_line) {
+          streams_are_the_same = false;
+          break;
+        }
+      }
+    }
+
+    return streams_are_the_same;
+  }
+
   std::string GetDiff() const override { return std::string(); };
   bool RunGoldTest() const override { return false; };
 
@@ -39,7 +76,12 @@ class GoldStreamEvaluator : public StreamEvaluatorI {
   void CloseStreams() {};
  private:
   //! Resets the streams to `bof`
-  void ResetStreams() const {};
+  auto ResetStreams() const -> void {
+    for (auto& stream : std::array{actual_stream_, gold_stream_}) {
+      stream->clear();
+      stream->seekg(0, std::ios::beg);
+    }
+  };
 
   mutable std::shared_ptr<std::istream> actual_stream_;
   mutable std::shared_ptr<std::istream> gold_stream_;
