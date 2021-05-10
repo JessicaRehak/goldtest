@@ -55,7 +55,7 @@ class GoldStreamEvaluator : public StreamEvaluatorI {
     return streams_are_the_same;
   }
   auto StreamsAreGoodAndTheSame() const -> bool override {
-    if (gold_stream_->bad() || actual_stream_->bad())
+    if (gold_stream_->fail() || actual_stream_->fail())
       return false;
     return StreamsAreTheSame();
   }
