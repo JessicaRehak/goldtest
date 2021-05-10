@@ -16,8 +16,8 @@ namespace goldtest {
  The two streams are the "gold" standard `gold_stream` and an "actual" stream
  `actual_stream`.
  
- \author Joshua Rehak
- \date 2018/2
+ \author J. Rehak
+ \date 2020/05
  */
 class GoldStreamEvaluator {
  public:
