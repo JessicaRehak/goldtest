@@ -9,8 +9,6 @@
 
 #include <dtl.hpp>
 
-#include "stream_evaluator_i.hpp"
-
 namespace goldtest {
 
 //! This class will conduct a line by line comparison test on two streams.
@@ -21,8 +19,9 @@ namespace goldtest {
  \author Joshua Rehak
  \date 2018/2
  */
-class GoldStreamEvaluator : public StreamEvaluatorI {
+class GoldStreamEvaluator {
  public:
+  using InStream = std::istream;
   //! Constructor, takes ownership of two streams for comparison
   GoldStreamEvaluator(std::shared_ptr<std::istream> actual_stream, std::shared_ptr<std::istream> gold_stream)
       : actual_stream_(std::move(actual_stream)), gold_stream_(std::move(gold_stream)) {
@@ -32,7 +31,7 @@ class GoldStreamEvaluator : public StreamEvaluatorI {
       throw std::invalid_argument("Pointer to gold stream provided to GoldStreamEvaluator is null");
   };
 
-  auto StreamsAreTheSame() const -> bool override {
+  auto StreamsAreTheSame() const -> bool {
     CheckStreams();
     ResetStreams();
 
@@ -54,13 +53,13 @@ class GoldStreamEvaluator : public StreamEvaluatorI {
 
     return streams_are_the_same;
   }
-  auto StreamsAreGoodAndTheSame() const -> bool override {
+  auto StreamsAreGoodAndTheSame() const -> bool {
     if (gold_stream_->fail() || actual_stream_->fail())
       return false;
     return StreamsAreTheSame();
   }
 
-  auto GetDiff() const -> std::string override {
+  auto GetDiff() const -> std::string {
     CheckStreams();
     ResetStreams();
 
@@ -82,8 +81,8 @@ class GoldStreamEvaluator : public StreamEvaluatorI {
     return diff_stream.str();
   };
 
-  auto gold_stream() -> InStream * override { return gold_stream_.get(); }
-  auto actual_stream() -> InStream * override { return actual_stream_.get(); }
+  auto gold_stream() -> InStream* { return gold_stream_.get(); }
+  auto actual_stream() -> InStream* { return actual_stream_.get(); }
  private:
   auto CheckStreams() const -> void {
     if (gold_stream_->bad()) {
