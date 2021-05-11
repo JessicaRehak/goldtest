@@ -1,4 +1,4 @@
-#include "../goldtest/gold_stream_evaluator.hpp"
+#include "goldtest/gold_stream_evaluator.hpp"
 
 #include <iostream>
 #include <memory>

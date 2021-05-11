@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "../file_writer.hpp"
-#include "../goldtest/goldtest.hpp"
+#include "example_and_tests/example/file_writer.hpp"
+#include "goldtest/goldtest.hpp"
 
 namespace  {
 

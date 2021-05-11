@@ -4,7 +4,7 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
-#include "gold_stream_evaluator.hpp"
+#include "goldtest/gold_stream_evaluator.hpp"
 
 #define EXPECT_GOLD_FILE_MATCH(actual_file_location, gold_file_location) \
 EXPECT_PRED_FORMAT2(goldtest::gold_test_passes, actual_file_location, gold_file_location)
